@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.BaseModels.auth.transactionModel import NewTransaction
+from backend.BaseModels.transactions.transactionModel import NewTransaction
 
 transaction_router = APIRouter(prefix="/transaction", tags=["Transações"])
 
