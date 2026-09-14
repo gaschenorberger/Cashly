@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 import bcrypt
 import jwt
 
-SECRET_KEY = "troque_essa_chave_em_producao"
+SECRET_KEY = "secretKey" # Utilizada inicialmente em desenvolvimento
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
