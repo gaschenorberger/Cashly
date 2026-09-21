@@ -1,34 +1,59 @@
-# docker compose up
-
 services:
   postgres:
     image: postgres:17
     container_name: cashly_postgres
     restart: unless-stopped
+
     environment:
       POSTGRES_DB: cashly_db
       POSTGRES_USER: cashly_user
-      POSTGRES_PASSWORD: cashly_password
+      POSTGRES_PASSWORD: "123"
+
     ports:
-      - "5432:5432"
+      - "5433:5432"
+
     volumes:
       - cashly_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cashly_user -d cashly_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DATABASE_URL: postgresql://cashly_user:123@postgres:5432/cashly_db
+
+    command: alembic upgrade head
 
   api:
     build:
       context: .
       dockerfile: backend/Dockerfile
+
     container_name: cashly_api
     restart: unless-stopped
+
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
     environment:
-      DATABASE_URL: postgresql://cashly_user:cashly_password@postgres:5432/cashly_db
+      DATABASE_URL: postgresql://cashly_user:123@postgres:5432/cashly_db
+
     ports:
       - "8001:8001"
-    volumes:
-      - .:/app
-    command: uvicorn backend.mainFastApi:app --host 0.0.0.0 --port 8001 --reload
 
 volumes:
   cashly_postgres_data:

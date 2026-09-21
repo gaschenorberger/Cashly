@@ -1,9 +1,6 @@
 import psycopg2
+import os
 
-conn = psycopg2.connect(
-    host="postgres",
-    port=5432,
-    database="cashly_db",
-    user="cashly_user",
-    password="cashly_password"
-)
+databaseUrl = os.getenv("DATABASE_URL")
+
+conn = psycopg2.connect(databaseUrl)
