@@ -1,7 +1,11 @@
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 import bcrypt
 import jwt
+
+bearer = HTTPBearer()
 
 SECRET_KEY = "secretKey" # Utilizada inicialmente em desenvolvimento
 ALGORITHM = "HS256"
@@ -59,3 +63,12 @@ def decode_access_token(token: str):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalido"
         )
+
+def getCurrentUserId(credentials: HTTPAuthorizationCredentials = Depends(bearer)):
+    payload = decode_access_token(credentials.credentials)
+    userId = payload.get("sub")
+
+    if not userId:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalido")
+
+    return int(userId)

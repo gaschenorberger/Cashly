@@ -8,7 +8,7 @@ def login(email: str, senha: str):
     try:
         usuario = userRepository.getByEmail(email)
 
-        if not usuario:
+        if usuario is None:
             raise HTTPException(status_code=400, detail="Email ou senha invalidos")
 
         senhaHash = usuario[3]
@@ -17,13 +17,18 @@ def login(email: str, senha: str):
             raise HTTPException(status_code=400, detail="Email ou senha invalidos")
 
 
-        token = security.create_access_token({"sub": str(usuario.id)})
+        token = security.create_access_token({"sub": str(usuario[0])})
+
+        usuarioAtivo = userRepository.getUserAtivo(email)
+        if not usuarioAtivo:
+            raise HTTPException(status_code=400, detail="Usuário inativo")
 
         return {
             "status": "OK",
             "mensagem": "Login efetuado",
             "access_token": token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "ativo": usuarioAtivo
         }
 
     except HTTPException:

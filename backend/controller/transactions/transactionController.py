@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from backend.BaseModels.transactions.transactionModel import NewTransaction
+from backend.security.security import getCurrentUserId
 
 transaction_router = APIRouter(prefix="/transaction", tags=["Transações"])
 
 @transaction_router.post("/newTransaction")
-async def newTransaction(transaction: NewTransaction):
+async def newTransaction(transaction: NewTransaction, userId: int = Depends(getCurrentUserId)):
     try:
         nomeTransacao = transaction.nomeTransacao
         valorTransacao = transaction.valor
