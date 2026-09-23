@@ -7,19 +7,10 @@ class TransactionType(str, Enum):
     entrada = "entrada"
     saida = "saida"
 
-class CategoryType(str, Enum):
-    alimentacao = "alimentação"
-    transporte = "transporte"
-    saude = "saúde"
-    educacao = "educação"
-    lazer = "lazer"
-    salario = "salário"
-    outros = "outros"
-
 class NewTransaction(BaseModel):
-    nomeTransacao: str
-    valor: Decimal = Field(gt=0, decimal_places=2)
+    nomeTransacao: str = Field(min_length=1, max_length=255)
+    valor: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
     tipoTransacao: TransactionType
-    categoria: CategoryType
+    categoriaId: int = Field(gt=0)
     dataTransacao: date
     observacao: str | None = None

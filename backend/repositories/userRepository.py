@@ -1,7 +1,9 @@
-from db.config import conn
+from db.config import getConn, putConn
 
 
 def getByEmail(email: str):
+    conn = getConn()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -16,9 +18,11 @@ def getByEmail(email: str):
     except Exception:
         conn.rollback()
         raise
-
+    finally:
+        putConn(conn)
 
 def setNewUser(nome, email, senha):
+    conn = getConn()
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -47,8 +51,12 @@ def setNewUser(nome, email, senha):
             "mensagem": "Erro ao cadastrar usuário",
             "erro": str(e)
         }
+    finally:
+        putConn(conn)
 
-def getUserAtivo(email):
+def getUserAtivo(email): # O usuário esta ativo ou inativo? (True/False)
+    conn = getConn()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -65,8 +73,12 @@ def getUserAtivo(email):
     except Exception:
         conn.rollback()
         raise
+    finally:
+        putConn(conn)
 
 def setUserInativo(email):
+    conn = getConn()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -81,3 +93,5 @@ def setUserInativo(email):
     except Exception:
         conn.rollback()
         raise
+    finally:
+        putConn(conn)
